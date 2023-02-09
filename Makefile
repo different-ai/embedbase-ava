@@ -18,9 +18,10 @@ run/dev: ## [Local development] Run the development docker image.
 run/prod:
 	docker-compose up -f docker-compose-prod.yaml
 
-docker/push: docker/build/prod ## [Local development] Push the docker image to registry.
-	docker push ${IMAGE_URL}
-	docker push ${LATEST_IMAGE_URL}
+test: ## [Local development] Run tests with pytest.
+# TODO: start docker embedbase here
+	python3 -m pytest -s middlewares/history/test_history.py
+	@echo "Done testing"
 
 release: ## [Local development] Release a new version of the API.
 	echo "Releasing version ${VERSION}"; \

@@ -1,0 +1,49 @@
+# This workflow will do a clean install of dependencies, cache/restore them, build the source code and run tests across different versions of python
+
+name: Unit Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      # - 'middlewares/**'
+      - unimpementederror/* # until we put effort in impl unit test ci here
+  # pull_request:
+  #   branches: [main]
+  #   paths:
+  #     - 'middlewares/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install deps
+        run: make install
+
+      - name: Read EMBEDBASE_TEST_CONFIG JSON secret and write it to config.yaml
+        env:
+          EMBEDBASE_TEST_CONFIG: ${{ secrets.EMBEDBASE_TEST_CONFIG }}
+        run: |
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O yq
+          chmod +x yq
+          echo $EMBEDBASE_TEST_CONFIG | yq -P > config.yaml
+
+      - name: Read EMBEDBASE_SVC JSON secret and write it to svc.prod.json
+        env:
+          EMBEDBASE_TEST_CONFIG: ${{ secrets.EMBEDBASE_TEST_CONFIG }}
+        run: |
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O yq
+          chmod +x yq
+          echo $EMBEDBASE_TEST_CONFIG | yq -P > config.yaml
+
+      # TODO: run docker embedbase ting
+
+      - name: Run tests
+        run: make test

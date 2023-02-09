@@ -2,9 +2,10 @@ import logging
 import os
 from typing import Tuple, Optional
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from firebase_admin import initialize_app, credentials, firestore, auth
 import sentry_sdk
-from google.cloud.firestore import Client, SERVER_TIMESTAMP
+from google.cloud.firestore import SERVER_TIMESTAMP
 from google.api_core.exceptions import InvalidArgument
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
@@ -30,8 +31,17 @@ _IGNORED_PATHS = [
     "docs",
 ]
 
+class DetailedError(Exception):
+    def __init__(self, scope: dict, status_code: int, detail: str) -> None:
+        self.scope = scope
+        self.status_code = status_code
+        self.detail = detail
 
-def firebase_auth(firestore_client, scope):
+    def __str__(self) -> str:
+        return self.detail
+
+
+async def firebase_auth(scope):
         # extract token from header
     for name, value in scope["headers"]:  # type: bytes, bytes
         if name == b"authorization":
@@ -41,12 +51,12 @@ def firebase_auth(firestore_client, scope):
         authorization = None
 
     if not authorization:
-        raise Exception(scope, 401, "missing authorization header")
+        raise DetailedError(scope, 401, "missing authorization header")
 
     s = authorization.split(" ")
 
     if len(s) != 2:
-        raise Exception(scope, 401, "invalid authorization header")
+        raise DetailedError(scope, 401, "invalid authorization header")
 
     token_type, token = s
     assert (
@@ -59,16 +69,16 @@ def firebase_auth(firestore_client, scope):
         # TODO: shouldn't check uid also?
         # remove whitespace before and after
         token = token.strip()
-        docs = firestore_client.collection("links").where("token", "==", token).get()
+        docs = fc.collection("links").where("token", "==", token).get()
         if len(docs) == 0:
-            raise Exception(scope, 401, "invalid token")
+            raise DetailedError(scope, 401, "invalid token")
         data = docs[0].to_dict()
     # except auth.ExpiredIdTokenError as err:
         # raise DetailedError(scope, 401, str(err))
     except InvalidArgument as err:
-        raise Exception(scope, 500, "please delete cache and login again")
+        raise DetailedError(scope, 500, "please delete cache and login again")
     except Exception as err:
-        raise Exception(scope, 401, str(err))
+        raise DetailedError(scope, 401, str(err))
 
     # add uid to scope
     scope["uid"] = data["userId"]
@@ -76,7 +86,7 @@ def firebase_auth(firestore_client, scope):
     try:
         user: auth.UserRecord = auth.get_user(scope["uid"])
     except:
-        raise Exception(scope, 401, "invalid uid")
+        raise DetailedError(scope, 401, "invalid uid")
     claims = user.custom_claims or {}
     stripe_role = claims.get("stripeRole", "free")
     scope["stripe_role"] = stripe_role
@@ -101,9 +111,9 @@ plans = {
     },
 }
 
-async def can_log(firestore_client: Client, user: str, group: str, scope: dict) -> Optional[str]:
+async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
     # get all the requests since the beginning of the month (first day)
-    current_month_history_by_path_doc = firestore_client.collection("quotas").document(
+    current_month_history_by_path_doc = fc.collection("quotas").document(
         user
     ).get()
     # no log yet
@@ -181,7 +191,7 @@ async def can_log(firestore_client: Client, user: str, group: str, scope: dict) 
                     + "Please contact us at ben@prologe.io to increase your plan limit"
                 )
 
-async def log(firestore_client: Client, user: str, group: str, scope: dict):
+async def log(user: str, group: str, scope: dict):
     """log the request in the history"""
     metadata = dict(scope)
     del metadata["app"]
@@ -189,7 +199,7 @@ async def log(firestore_client: Client, user: str, group: str, scope: dict):
     metadata["headers"] = dict(
         (k.decode("utf8"), v.decode("utf8")) for k, v in metadata["headers"]
     )
-    firestore_client.collection("history").add(
+    fc.collection("history").add(
         {
             "user": user,
             "group": group,
@@ -210,10 +220,10 @@ async def on_auth_error(exc: Exception, scope: dict):
     logging.error(message, exc_info=True)
     if status_code == 500:
         sentry_sdk.capture_message(message, level="error")
-    return {
-        "status_code": status_code,
-        "content": {"message": message},
-    }
+    return JSONResponse(
+        status_code=status_code,
+        content={"message": message},
+    )
 
 def middleware(app: FastAPI):
     @app.middleware("http")
@@ -241,7 +251,7 @@ def middleware(app: FastAPI):
 
 
         # check if the user can log this request within his plan
-        error = await can_log(fc, user, group, request.scope)
+        error = await can_log(user, group, request.scope)
         if error is not None:
             # TODO 402 OK ? https://stackoverflow.com/questions/39221380/what-is-the-http-status-code-for-license-limit-reached
             return await _on_error(Exception(request.scope, 402, error))
