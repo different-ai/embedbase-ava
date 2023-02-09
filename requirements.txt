@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pinecone-client
+pandas
+openai
+tenacity
+gunicorn
+pydantic_yaml[pyyaml]

@@ -1,0 +1,19 @@
+black
+mypy
+pylint
+pytest-cov
+pytest-xdist
+pytest
+ipykernel
+Flask
+ipywidgets
+plotly
+wandb
+httpx
+trio
+anyio
+pytest-asyncio
+jupyter
+functions_framework
+# for automatically removing unused imports
+autoflake
