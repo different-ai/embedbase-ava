@@ -12,3 +12,4 @@ env
 .env
 
 config.yaml
+*svc*

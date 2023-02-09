@@ -1,0 +1,52 @@
+
+tasks:
+    - name: Install dependencies
+      command: |
+        export PIP_USER=false
+        make install
+    - name: Generate config
+      command: |
+        eval $(gp env -e)
+        pip3 install yq
+        echo "$EMBEDBASE_CONFIG" | yq -y > config.yaml
+    - name: Generate SVC
+      command: |
+        eval $(gp env -e)
+        echo "$OBSIDIAN_AI_SVC" > svc.prod.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/svc.prod.json
+        gcloud beta auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --project=$(cat ${GOOGLE_APPLICATION_CREDENTIALS} | jq -r '.project_id')
+        echo "Current Google Cloud project is $(gcloud config list --format 'value(core.project)' 2>/dev/null)"
+        mkdir -p ~/.docker
+        cat >~/.docker/config.json <<EOL
+        {
+          "credHelpers": {
+            "gcr.io": "gcloud",
+            "us.gcr.io": "gcloud",
+            "eu.gcr.io": "gcloud",
+            "asia.gcr.io": "gcloud",
+            "staging-k8s.gcr.io": "gcloud",
+            "marketplace.gcr.io": "gcloud"
+          }
+        }
+        EOL
+        # will crash btw
+        firebase login --no-localhost
+vscode:
+  extensions:
+    - github.copilot
+    - toba.vsfire
+    - wix.vscode-import-cost
+    - aaron-bond.better-comments
+    - perkovec.emoji
+    - ms-python.vscode-pylance
+    - ms-python.python
+    - littlefoxteam.vscode-python-test-adapter
+    - k--kato.intellij-idea-keybindings
+    - trungngo.autoflake
+    - christian-kohler.npm-intellisense
+    - dbaeumer.vscode-eslint
+
+
+ports:
+  - port: 8000
+    visibility: public

@@ -16,13 +16,7 @@ run/dev: ## [Local development] Run the development docker image.
 	docker-compose up
 
 run/prod:
-# note we don't use buildx here to use local platform cpu
-	docker build . -t embedbase -f ./docker/Dockerfile
-	docker run -p 8000:8080 \
-		-v ${PWD}:/app embedbase
-
-# enter docker container
-docker exec -it embedbase bash
+	docker-compose up -f docker-compose-prod.yaml
 
 docker/push: docker/build/prod ## [Local development] Push the docker image to registry.
 	docker push ${IMAGE_URL}

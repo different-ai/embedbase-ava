@@ -3,10 +3,9 @@ version: '3.7'
 services:
   embedbase:
     container_name: embedbase
-    image: ghcr.io/another-ai/embedbase:latest-dev
+    image: ghcr.io/another-ai/embedbase:latest
     ports:
       - "8000:8000"
-    command: uvicorn search.api:app --reload --log-level debug --host 0.0.0.0
     environment:
       - PYTHONUNBUFFERED=1
       - PORT=8000
