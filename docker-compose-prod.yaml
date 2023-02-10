@@ -3,9 +3,7 @@ version: '3.7'
 services:
   embedbase:
     container_name: embedbase
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: gcr.io/obsidian-ai/embedbase-internal:latest
     ports:
       - "8000:8000"
     environment:
