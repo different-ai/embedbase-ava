@@ -21,7 +21,14 @@ sentry_sdk.init(
         "profiles_sample_rate": 1.0,
     },
 )
-cred = credentials.Certificate("svc.prod.json")
+SECRET_FIREBASE_PATH = (
+    "/secrets_firebase" if os.path.exists("/secrets_firebase") else ".."
+)
+
+
+if not os.path.exists(SECRET_FIREBASE_PATH + "/svc.prod.json"):
+    SECRET_FIREBASE_PATH = "."
+cred = credentials.Certificate(SECRET_FIREBASE_PATH + "/svc.prod.json")
 initialize_app(cred)
 fc = firestore.client()
 

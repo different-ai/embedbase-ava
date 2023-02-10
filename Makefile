@@ -36,7 +36,7 @@ push: build ## [Local development] Push the docker image to GCP.
 	docker push ${LATEST_IMAGE_URL}
 
 deploy: push ## [Local development] Deploy the Cloud run service.
-	@echo "Will deploy Obsidian AI to ${REGION} on ${GCLOUD_PROJECT}"
+	@echo "Will deploy embedbase-internal to ${REGION} on ${GCLOUD_PROJECT}"
 	gcloud beta run services replace ./service.prod.yaml --region ${REGION}
 
 release: ## [Local development] Release a new version of the API.
