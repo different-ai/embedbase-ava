@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: search
+  name: embedbase-internal
 spec:
   template:
     metadata:
@@ -12,8 +12,10 @@ spec:
         autoscaling.knative.dev/minScale: "1"
         autoscaling.knative.dev/maxScale: "100"
     spec:
+      serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
+        image: gcr.io/obsidian-ai/embedbase-internal:0.0.1
         startupProbe:
           httpGet:
             httpHeaders:
@@ -29,7 +31,7 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /secrets_firebase/svc.prod.json
           - name: SENTRY_RELEASE
-            value: "0.5.3"
+            value: "0.0.1"
           - name: ENVIRONMENT
             value: "production"
           - name: UPLOAD_BATCH_SIZE
@@ -42,7 +44,7 @@ spec:
         resources:
           limits:
             cpu: "4"
-            memory: 2048Mi
+            memory: 4096Mi
         volumeMounts:
           - name: settings
             readOnly: true
@@ -53,9 +55,9 @@ spec:
       volumes:
         - name: settings
           secret:
-            secretName: SEARCH
+            secretName: EMBEDBASE_INTERNAL
             items:
-              - key: "4"
+              - key: "1"
                 path: config.yaml
         - name: firebase_admin_service_account
           secret:

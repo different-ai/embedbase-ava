@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: search-dev
+  name: embedbase-internal-dev
 spec:
   template:
     metadata:
@@ -12,8 +12,10 @@ spec:
         autoscaling.knative.dev/minScale: "0"
         autoscaling.knative.dev/maxScale: "20"
     spec:
+      serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
+        image: gcr.io/obsidian-ai/embedbase-internal:0.0.1
         startupProbe:
           httpGet:
             httpHeaders:

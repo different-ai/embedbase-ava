@@ -31,6 +31,10 @@ tasks:
         EOL
         # will crash btw
         firebase login --no-localhost
+
+image:
+  file: .gitpod.Dockerfile
+
 vscode:
   extensions:
     - github.copilot
