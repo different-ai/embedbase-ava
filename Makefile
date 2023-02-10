@@ -40,7 +40,7 @@ deploy: push ## [Local development] Deploy the Cloud run service.
 	gcloud beta run services replace ./service.prod.yaml --region ${REGION}
 
 release: ## [Local development] Release a new version of the API.
-	echo "Releasing version ${VERSION}"; \
+	@echo "Releasing version ${VERSION}"; \
 	read -p "Commit content:" COMMIT; \
 	git add .; \
 	echo "Committing '${VERSION}: $$COMMIT'"; \

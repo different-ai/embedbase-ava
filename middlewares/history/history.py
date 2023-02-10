@@ -238,6 +238,9 @@ def middleware(app: FastAPI):
         if request.scope["type"] != "http":  # pragma: no cover
             return await call_next(request)
 
+        if "health" in request.scope["path"]:
+            return await call_next(request)
+
         # in development mode, allow redoc, openapi etc
         if ENVIRONMENT == "development" and any(
             path in request.scope["path"] for path in _IGNORED_PATHS
