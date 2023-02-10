@@ -15,7 +15,7 @@ spec:
       serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
-        image: gcr.io/obsidian-ai/embedbase-internal:0.0.2
+        image: gcr.io/obsidian-ai/embedbase-internal:0.0.3
         startupProbe:
           httpGet:
             httpHeaders:
@@ -31,7 +31,7 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /secrets_firebase/svc.prod.json
           - name: SENTRY_RELEASE
-            value: "0.0.2"
+            value: "0.0.3"
           - name: ENVIRONMENT
             value: "production"
           - name: UPLOAD_BATCH_SIZE
