@@ -32,8 +32,8 @@ tasks:
         # will crash btw
         firebase login --no-localhost
 
-image:
-  file: .gitpod.Dockerfile
+# image: # TODO:broken image?
+  # file: .gitpod.Dockerfile
 
 vscode:
   extensions:
