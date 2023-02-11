@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 from typing import Tuple, Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -7,7 +8,6 @@ from firebase_admin import initialize_app, credentials, firestore, auth
 import sentry_sdk
 from google.cloud.firestore import SERVER_TIMESTAMP
 from google.api_core.exceptions import InvalidArgument
-
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
 sentry_sdk.init(
@@ -37,6 +37,7 @@ _IGNORED_PATHS = [
     "redoc",
     "docs",
 ]
+path_transform_regex = re.compile(r"/v1/[^/]+/")
 
 class DetailedError(Exception):
     def __init__(self, scope: dict, status_code: int, detail: str) -> None:
@@ -118,6 +119,8 @@ plans = {
     },
 }
 
+
+
 async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
     # get all the requests since the beginning of the month (first day)
     current_month_history_by_path_doc = fc.collection("quotas").document(
@@ -130,23 +133,25 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
     current_month_history_by_path = current_month_history_by_path_doc.to_dict()
     stripe_role = scope.get("stripe_role", "free")
 
+    current_path = scope["path"]
+
     if stripe_role == "free":
         p = "/v1/text/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/image/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/search"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -154,21 +159,21 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
                 )
     elif stripe_role == "hobby":
         p = "/v1/text/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/image/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/search"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -177,21 +182,21 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
 
     elif stripe_role == "pro":
         p = "/v1/text/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please contact us at ben@prologe.io to increase your plan limit"
                 )
         p = "/v1/image/create"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please contact us at ben@prologe.io to increase your plan limit"
                 )
         p = "/v1/search"
-        if scope["path"] == p:
+        if current_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -259,7 +264,10 @@ def middleware(app: FastAPI):
         except Exception as exc:
             return await _on_error(exc)
 
-
+        current_path = request.scope["path"]
+        # turns "/v1/gbdp609rg6/search" into "/v1/search"
+        current_path = path_transform_regex.sub("/v1/", current_path)
+        request.scope["path"] = current_path
         # check if the user can log this request within his plan
         error = await can_log(user, group, request.scope)
         if error is not None:
