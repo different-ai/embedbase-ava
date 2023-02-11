@@ -133,25 +133,25 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
     current_month_history_by_path = current_month_history_by_path_doc.to_dict()
     stripe_role = scope.get("stripe_role", "free")
 
-    current_path = scope["path"]
+    history_path = scope["history_path"]
 
     if stripe_role == "free":
         p = "/v1/text/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/image/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/search"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -159,21 +159,21 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
                 )
     elif stripe_role == "hobby":
         p = "/v1/text/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/image/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please upgrade your plan on https://app.anotherai.co"
                 )
         p = "/v1/search"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -182,21 +182,21 @@ async def can_log(user: str, group: str, scope: dict) -> Optional[str]:
 
     elif stripe_role == "pro":
         p = "/v1/text/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} texts. "
                     + "Please contact us at ben@prologe.io to increase your plan limit"
                 )
         p = "/v1/image/create"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} images. "
                     + "Please contact us at ben@prologe.io to increase your plan limit"
                 )
         p = "/v1/search"
-        if current_path == p:
+        if history_path == p:
             if current_month_history_by_path.get(p, 0) > plans[stripe_role][p]:
                 return (
                     f"You exceeded your plan limit of {plans[stripe_role][p]} links. "
@@ -211,10 +211,12 @@ async def log(user: str, group: str, scope: dict):
     metadata["headers"] = dict(
         (k.decode("utf8"), v.decode("utf8")) for k, v in metadata["headers"]
     )
+    metadata["path"] = metadata["history_path"]
     fc.collection("history").add(
         {
             "user": user,
             "group": group,
+            # TODO: agree & remove all unnecessary fields that are stored in the history
             "scope": metadata,
             "timestamp": SERVER_TIMESTAMP,
         }
@@ -229,7 +231,7 @@ async def on_auth_error(exc: Exception, scope: dict):
     )
     message = exc.detail if hasattr(exc, "detail") else str(exc)
 
-    logging.error(message, exc_info=True)
+    logging.warning(message, exc_info=True)
     if status_code == 500:
         sentry_sdk.capture_message(message, level="error")
     return JSONResponse(
@@ -267,7 +269,7 @@ def middleware(app: FastAPI):
         current_path = request.scope["path"]
         # turns "/v1/gbdp609rg6/search" into "/v1/search"
         current_path = path_transform_regex.sub("/v1/", current_path)
-        request.scope["path"] = current_path
+        request.scope["history_path"] = current_path
         # check if the user can log this request within his plan
         error = await can_log(user, group, request.scope)
         if error is not None:
