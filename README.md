@@ -1,7 +1,7 @@
 <br />
 <p align="center">
 
-  <h1 align="center">Embedbase Ava</h1>
+  <h1 align="center"><a href="https://embedbase.xyz">Embedbase</a> Ava</h1>
 
   <p align="center">
     <a href="https://app.anotherai.co">Connect your Obsidian notes</a>
