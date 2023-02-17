@@ -55,9 +55,9 @@ spec:
       volumes:
         - name: settings
           secret:
-            secretName: SEARCH
+            secretName: EMBEDBASE_INTERNAL
             items:
-              - key: "4"
+              - key: "1"
                 path: config.yaml
         - name: firebase_admin_service_account
           secret:

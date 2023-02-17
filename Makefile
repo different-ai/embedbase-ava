@@ -6,8 +6,6 @@ VERSION=$(shell sed -n 's/.*image:.*:\(.*\)/\1/p' service.prod.yaml)
 IMAGE_URL=$(shell echo "gcr.io/${GCLOUD_PROJECT}/${SERVICE}:${VERSION}")
 REGION="us-central1"
 
--include .env
-
 install: ## [DEVELOPMENT] Install the API dependencies
 	virtualenv env; \
 	source env/bin/activate; \
@@ -22,8 +20,11 @@ run/prod:
 	docker-compose -f docker-compose-prod.yaml up
 
 test: ## [Local development] Run tests with pytest.
-# TODO: start docker embedbase here
+	make run/dev &
+	while ! curl -s -X GET http://localhost:8000/health | grep "success"; do sleep 1; done
+	. env/bin/activate; \
 	python3 -m pytest -s middlewares/history/test_history.py
+	docker-compose down
 	@echo "Done testing"
 
 build: ## [Local development] Build the docker image.
