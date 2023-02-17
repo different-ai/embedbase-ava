@@ -1,3 +1,22 @@
+<br />
+<p align="center">
+
+  <h1 align="center">Embedbase Ava</h1>
+
+  <p align="center">
+    <a href="https://app.anotherai.co">Connect your Obsidian notes</a>
+    ·
+    <a href="https://github.com/supabase/realtime/issues/new?assignees=&labels=enhancement">Request Feature</a>
+    ·
+    <a href="https://github.com/supabase/realtime/issues/new?assignees=&labels=bug">Report Bug</a>
+    <br />
+  </p>
+</p>
+
+The codebase is under heavy development and the documentation is constantly evolving. Give it a try and let us know what you think by creating an issue. Watch [releases](https://github.com/supabase/realtime/releases) of this repo to get notified of updates. And give us a star if you like it!
+
+
+## Development
 
 
 ```yaml
