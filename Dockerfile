@@ -1,2 +1,2 @@
 FROM ghcr.io/another-ai/embedbase:latest
-COPY ./middlewares/history/history.py /app/middlewares/history.py
+COPY ./middlewares/history/history.py /app/middlewares/history/history.py

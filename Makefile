@@ -14,7 +14,7 @@ install: ## [DEVELOPMENT] Install the API dependencies
 	@echo "Done, run '\033[0;31msource env/bin/activate\033[0m' to activate the virtual environment"
 
 run/dev: ## [Local development] Run the development docker image.
-	docker-compose up
+	docker-compose up --build
 
 run/prod:
 	docker-compose -f docker-compose-prod.yaml up

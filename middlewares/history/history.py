@@ -8,6 +8,8 @@ from firebase_admin import initialize_app, credentials, firestore, auth
 import sentry_sdk
 from google.cloud.firestore import SERVER_TIMESTAMP
 from google.api_core.exceptions import InvalidArgument
+from starlette.middleware.base import BaseHTTPMiddleware
+
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
 sentry_sdk.init(
@@ -239,9 +241,8 @@ async def on_auth_error(exc: Exception, scope: dict):
         content={"message": message},
     )
 
-def middleware(app: FastAPI):
-    @app.middleware("http")
-    async def history(request: Request, call_next) -> Tuple[str, str]:
+class History(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next) -> Tuple[str, str]:
         if request.scope["type"] != "http":  # pragma: no cover
             return await call_next(request)
 
