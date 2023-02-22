@@ -36,7 +36,7 @@ spec:
             value: "development"
           - name: UPLOAD_BATCH_SIZE
             value: "100"
-          - name: MAX_NOTE_LENGTH
+          - name: MAX_DOCUMENT_LENGTH
             value: "2000"
         ports:
           - containerPort: 8080

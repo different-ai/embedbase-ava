@@ -15,7 +15,7 @@ spec:
       serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
-        image: gcr.io/obsidian-ai/embedbase-internal:0.0.8
+        image: gcr.io/obsidian-ai/embedbase-internal:0.0.9
         # TODO: fix health?
         # startupProbe:
         #   httpGet:
@@ -29,12 +29,12 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /secrets_firebase/svc.prod.json
           - name: SENTRY_RELEASE
-            value: "0.0.8"
+            value: "0.0.9"
           - name: ENVIRONMENT
             value: "production"
           - name: UPLOAD_BATCH_SIZE
             value: "100"
-          - name: MAX_NOTE_LENGTH
+          - name: MAX_DOCUMENT_LENGTH
             value: "2000"
         ports:
           - containerPort: 8080
