@@ -233,7 +233,7 @@ async def on_auth_error(exc: Exception, scope: dict):
     )
     message = exc.detail if hasattr(exc, "detail") else str(exc)
 
-    logging.warning(message, exc_info=True)
+    logging.warning(message)
     if status_code == 500:
         sentry_sdk.capture_message(message, level="error")
     return JSONResponse(
