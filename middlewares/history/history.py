@@ -12,6 +12,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
+_IGNORED_PATHS = [
+    "openapi.json",
+    "redoc",
+    "docs",
+    "health",
+    "test" # HACK: implementation detail in embedbase health endpoint
+]
+
 sentry_sdk.init(
     dsn="https://0ccb093b6ca642d9a173411aacb045b9@o404046.ingest.sentry.io/4504407326851072",
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -244,9 +252,6 @@ async def on_auth_error(exc: Exception, scope: dict):
 class History(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Tuple[str, str]:
         if request.scope["type"] != "http":  # pragma: no cover
-            return await call_next(request)
-
-        if "health" in request.scope["path"]:
             return await call_next(request)
 
         # in development mode, allow redoc, openapi etc

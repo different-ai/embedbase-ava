@@ -15,14 +15,11 @@ spec:
       serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
-        image: gcr.io/obsidian-ai/embedbase-internal:0.0.1
+        image: gcr.io/obsidian-ai/embedbase-internal:latest-dev
         startupProbe:
           httpGet:
-            httpHeaders:
-              - name: Authorization
-                value: Bearer local
             path: /health
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           successThreshold: 1
           periodSeconds: 30
           timeoutSeconds: 30
@@ -36,8 +33,6 @@ spec:
             value: "development"
           - name: UPLOAD_BATCH_SIZE
             value: "100"
-          - name: MAX_DOCUMENT_LENGTH
-            value: "2000"
         ports:
           - containerPort: 8080
             name: http1
@@ -55,7 +50,7 @@ spec:
       volumes:
         - name: settings
           secret:
-            secretName: EMBEDBASE_INTERNAL
+            secretName: EMBEDBASE_AVA_DEV
             items:
               - key: "1"
                 path: config.yaml

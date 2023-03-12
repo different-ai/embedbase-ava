@@ -16,15 +16,14 @@ spec:
       containerConcurrency: 80
       containers:
         image: gcr.io/obsidian-ai/embedbase-internal:0.1.0
-        # TODO: fix health?
-        # startupProbe:
-        #   httpGet:
-        #     path: /health
-        #   initialDelaySeconds: 30
-        #   successThreshold: 1
-        #   periodSeconds: 30
-        #   timeoutSeconds: 30
-        #   failureThreshold: 30
+        startupProbe:
+          httpGet:
+            path: /health
+          initialDelaySeconds: 30
+          successThreshold: 1
+          periodSeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 30
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /secrets_firebase/svc.prod.json
@@ -34,8 +33,6 @@ spec:
             value: "production"
           - name: UPLOAD_BATCH_SIZE
             value: "100"
-          - name: MAX_DOCUMENT_LENGTH
-            value: "2000"
         ports:
           - containerPort: 8080
             name: http1

@@ -9,13 +9,15 @@ tasks:
         eval $(gp env -e)
         pip3 install yq
         echo "$EMBEDBASE_CONFIG" | yq -y > config.yaml
-    - name: Generate SVC
+    - name: Generate Firebase service account
+      command: |
+        echo $FIREBASE_SERVICE_ACCOUNT > svc.prod.json
+    - name: GCloud
       command: |
         eval $(gp env -e)
-        echo "$OBSIDIAN_AI_SVC" > svc.prod.json
-        export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/svc.prod.json
-        gcloud beta auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS} --project=$(cat ${GOOGLE_APPLICATION_CREDENTIALS} | jq -r '.project_id')
-        echo "Current Google Cloud project is $(gcloud config list --format 'value(core.project)' 2>/dev/null)"
+        gcloud auth login
+        gcloud config set project obsidian-ai
+        echo "sat project to obsidian-ai"
         mkdir -p ~/.docker
         cat >~/.docker/config.json <<EOL
         {
@@ -29,11 +31,14 @@ tasks:
           }
         }
         EOL
-        # will crash btw
-        firebase login --no-localhost
-
-# image: # TODO:broken image?
-  # file: .gitpod.Dockerfile
+    - name: Init Supabase
+      command: |
+        npx supabase login
+    - name: Init Firebase
+      command: |
+        npx firebase-tools
+image:
+  file: .gitpod.Dockerfile
 
 vscode:
   extensions:

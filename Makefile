@@ -49,7 +49,7 @@ release: ## [Local development] Release a new version of the API.
 	git push origin main; \
 	git tag ${VERSION}; \
 	git push origin ${VERSION}
-	@echo "Done, check https://github.com/another-ai/embedbase-internal/actions"
+	@echo "Done, check https://github.com/different-ai/embedbase-ava/actions"
 
 .PHONY: help
 
