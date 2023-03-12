@@ -28,12 +28,12 @@ middlewares:
 ```
 
 ```bash
-gcloud secrets create EMBEDBASE_INTERNAL --replication-policy=automatic
-gcloud secrets versions add EMBEDBASE_INTERNAL --data-file=config.yaml
+gcloud secrets create EMBEDBASE_AVA --replication-policy=automatic
+gcloud secrets versions add EMBEDBASE_AVA --data-file=config.yaml
 ```
 
 ```bash
-gcloud run services set-iam-policy embedbase-internal ./policy.yaml --region us-central1
+gcloud run services set-iam-policy embedbase-ava ./policy.yaml --region us-central1
 ```
 
 ### Automatic deployment through GitHub Actions

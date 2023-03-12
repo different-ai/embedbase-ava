@@ -6,7 +6,7 @@ on:
       - "*.*.*"
 env:
   PROJECT_ID: obsidian-ai
-  SERVICE: embedbase-internal
+  SERVICE: embedbase-ava
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: embedbase-internal-dev
+  name: embedbase-ava-dev
 spec:
   template:
     metadata:
@@ -15,7 +15,7 @@ spec:
       serviceAccountName: obsidian-ai-cloud-run@obsidian-ai.iam.gserviceaccount.com
       containerConcurrency: 80
       containers:
-        image: gcr.io/obsidian-ai/embedbase-internal:latest-dev
+        image: gcr.io/obsidian-ai/embedbase-ava:latest-dev
         startupProbe:
           httpGet:
             path: /health

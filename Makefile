@@ -1,5 +1,5 @@
 LOCAL_PORT="8000"
-SERVICE="embedbase-internal"
+SERVICE="embedbase-ava"
 GCLOUD_PROJECT:=$(shell gcloud config list --format 'value(core.project)' 2>/dev/null || echo "none")
 LATEST_IMAGE_URL=$(shell echo "gcr.io/${GCLOUD_PROJECT}/${SERVICE}:latest")
 VERSION=$(shell sed -n 's/.*image:.*:\(.*\)/\1/p' service.prod.yaml)
@@ -37,8 +37,13 @@ push: build ## [Local development] Push the docker image to GCP.
 	docker push ${LATEST_IMAGE_URL}
 
 deploy: push ## [Local development] Deploy the Cloud run service.
-	@echo "Will deploy embedbase-internal to ${REGION} on ${GCLOUD_PROJECT}"
+	@echo "Will deploy embedbase-ava to ${REGION} on ${GCLOUD_PROJECT}"
 	gcloud beta run services replace ./service.prod.yaml --region ${REGION}
+
+deploy/dev: ## [Local development] Deploy the Cloud run service.
+	docker buildx build . --platform linux/amd64 -t ${LATEST_IMAGE_URL}-dev -f ./Dockerfile
+	docker push ${LATEST_IMAGE_URL}-dev
+	gcloud beta run services replace ./service.dev.yaml --region ${REGION}
 
 release: ## [Local development] Release a new version of the API.
 	@echo "Releasing version ${VERSION}"; \

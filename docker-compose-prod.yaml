@@ -3,7 +3,7 @@ version: '3.7'
 services:
   embedbase:
     container_name: embedbase
-    image: gcr.io/obsidian-ai/embedbase-internal:latest
+    image: gcr.io/obsidian-ai/embedbase-ava:latest
     ports:
       - "8000:8000"
     environment:
