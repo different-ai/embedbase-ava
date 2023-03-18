@@ -58,7 +58,7 @@ class DetailedError(Exception):
 
 
 async def firebase_auth(scope):
-        # extract token from header
+    # extract token from header
     for name, value in scope["headers"]:  # type: bytes, bytes
         if name == b"authorization":
             authorization = value.decode("utf8")

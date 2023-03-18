@@ -1,19 +1,19 @@
 <br />
 <p align="center">
 
-  <h1 align="center"><a href="https://embedbase.xyz">Embedbase</a> Ava</h1>
+  <h1 align="center">Obsidian.md + <a href="https://github.com/different-ai/embedbase">Embedbase</a> =  Ava</h1>
 
   <p align="center">
-    <a href="https://app.anotherai.co">Connect your Obsidian notes</a>
+    <a href="https://github.com/louis030195/obsidian-ava">Connect your Obsidian notes</a>
     ·
-    <a href="https://github.com/supabase/realtime/issues/new?assignees=&labels=enhancement">Request Feature</a>
+    <a href="https://github.com/different-ai/embedbase-ava/issues/new?assignees=&labels=enhancement">Request Feature</a>
     ·
-    <a href="https://github.com/supabase/realtime/issues/new?assignees=&labels=bug">Report Bug</a>
+    <a href="https://github.com/different-ai/embedbase-ava/issues/new?assignees=&labels=bug">Report Bug</a>
     <br />
   </p>
 </p>
 
-The codebase is under heavy development and the documentation is constantly evolving. Give it a try and let us know what you think by creating an issue. Watch [releases](https://github.com/supabase/realtime/releases) of this repo to get notified of updates. And give us a star if you like it!
+The codebase is under heavy development and the documentation is constantly evolving. Give it a try and let us know what you think by creating an issue. Watch [releases](https://github.com/different-ai/embedbase-ava/releases) of this repo to get notified of updates. And give us a star if you like it!
 
 
 ## Development
@@ -21,11 +21,20 @@ The codebase is under heavy development and the documentation is constantly evol
 
 ```yaml
 # config.yaml
-# ...
-middlewares:
-  - middlewares.history
-# ...
+openai_api_key: ...
+openai_organization: ...
+log_level: DEBUG
+environment: development
+vector_database: supabase
+supabase_url: ...
+supabase_key: ...
 ```
+
+```bash
+make run
+```
+
+### Infra
 
 ```bash
 gcloud secrets create EMBEDBASE_AVA --replication-policy=automatic

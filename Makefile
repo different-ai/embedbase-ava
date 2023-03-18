@@ -13,18 +13,17 @@ install: ## [DEVELOPMENT] Install the API dependencies
 	pip install -r requirements-test.txt
 	@echo "Done, run '\033[0;31msource env/bin/activate\033[0m' to activate the virtual environment"
 
-run/dev: ## [Local development] Run the development docker image.
+run:
+	python3 -m uvicorn main:app --reload --port ${LOCAL_PORT}
+
+docker/run/dev: ## [Local development] Run the development docker image.
 	docker-compose up --build
 
-run/prod:
+docker/run/prod:
 	docker-compose -f docker-compose-prod.yaml up
 
 test: ## [Local development] Run tests with pytest.
-	make run/dev &
-	while ! curl -s -X GET http://localhost:8000/health | grep "success"; do sleep 1; done
-	. env/bin/activate; \
-	python3 -m pytest -s middlewares/history/test_history.py
-	docker-compose down
+	python3 -m pytest  -s ./middlewares/history/test_history.py::test_on_auth_error
 	@echo "Done testing"
 
 build: ## [Local development] Build the docker image.

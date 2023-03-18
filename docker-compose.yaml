@@ -8,11 +8,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    command: uvicorn embedbase.__main__:app --reload --log-level debug --host 0.0.0.0
+    command: uvicorn main:app --reload --log-level debug --host 0.0.0.0
     environment:
       - PYTHONUNBUFFERED=1
       - PORT=8000
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./middlewares/history/history.py:/app/middlewares/history/history.py
       - ./svc.prod.json:/app/svc.prod.json

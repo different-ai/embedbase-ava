@@ -1,3 +1,6 @@
 fastapi
 firebase_admin
 sentry-sdk[fastapi]
+embedbase==0.8.8
+supabase
+semantic-version

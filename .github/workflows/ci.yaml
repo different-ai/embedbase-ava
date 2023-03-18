@@ -6,12 +6,11 @@ on:
   push:
     branches: [main]
     paths:
-      # - 'middlewares/**'
-      - unimpementederror/* # until we put effort in impl unit test ci here
-  # pull_request:
-  #   branches: [main]
-  #   paths:
-  #     - 'middlewares/**'
+      - 'middlewares/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'middlewares/**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -43,7 +42,7 @@ jobs:
           chmod +x yq
           echo $EMBEDBASE_TEST_CONFIG | yq -P > config.yaml
 
-      # TODO: run docker embedbase ting
-
       - name: Run tests
-        run: make test
+        run: |
+          . env/bin/activate
+          make test
