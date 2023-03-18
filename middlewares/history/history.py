@@ -284,13 +284,7 @@ class History(BaseHTTPMiddleware):
             # TODO 402 OK ? https://stackoverflow.com/questions/39221380/what-is-the-http-status-code-for-license-limit-reached
             return await _on_error(Exception(request.scope, 402, error))
 
-        # TODO https://www.notion.so/anotherai/analytics-collecting-prompt-body-226b3bc28a824db9bca799a63dbab054
-        # TODO when merged https://github.com/encode/starlette/pull/1692
-        # request = Request(scope, receive)
-        # json_body = await request.json()
-        # scope["body"] = json_body
         await log(user, group, request.scope)
-        # return await self.app(scope, receive, send)
 
         response = await call_next(request)
         return response
