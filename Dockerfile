@@ -1,4 +1,4 @@
-FROM ghcr.io/different-ai/embedbase:0.8.8-minimal
+FROM ghcr.io/different-ai/embedbase:0.8.9-minimal
 COPY requirements.txt requirements.txt
 RUN apt-get update && apt-get install -y git && apt-get clean && \
     pip install -r requirements.txt && rm requirements.txt
