@@ -1,3 +1,4 @@
+import os
 from embedbase import get_app
 
 from embedbase.settings import get_settings
@@ -10,7 +11,7 @@ import semantic_version
 import logging
 
 settings = get_settings()
-
+MINIMUM_VERSION = os.getenv("MINIMUM_VERSION", "2.19.0")
 
 async def version_check(request: Request, call_next):
     if any(path in request.scope["path"] for path in PRODUCTION_IGNORED_PATHS):
@@ -30,7 +31,7 @@ async def version_check(request: Request, call_next):
             content={"message": "missing client version"},
         )
 
-    if semantic_version.Version(client_version) < semantic_version.Version("2.18.8"):
+    if semantic_version.Version(client_version) < semantic_version.Version(MINIMUM_VERSION):
         message = "version too old, please update your plugin"
         logging.info(message)
         return JSONResponse(
