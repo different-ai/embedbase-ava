@@ -16,7 +16,10 @@
 The codebase is under heavy development and the documentation is constantly evolving. Give it a try and let us know what you think by creating an issue. Watch [releases](https://github.com/different-ai/embedbase-ava/releases) of this repo to get notified of updates. And give us a star if you like it!
 
 
-## Development
+## Running locally
+
+Follow the steps there to setup a supabase project:
+https://docs.embedbase.xyz/self-hosting/deployment
 
 
 ```yaml
