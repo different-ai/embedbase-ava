@@ -24,6 +24,14 @@ spec:
           periodSeconds: 30
           timeoutSeconds: 30
           failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /health
+          initialDelaySeconds: 30
+          successThreshold: 1
+          periodSeconds: 30
+          timeoutSeconds: 30
+          failureThreshold: 30
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /secrets_firebase/svc.prod.json
